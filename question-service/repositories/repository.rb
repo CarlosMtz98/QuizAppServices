@@ -15,7 +15,7 @@ module Repository
     raise "Not implemented jet"
   end
 
-  def update(entity)
+  def update(id, entity)
     raise "Not implemented jet"
   end
 

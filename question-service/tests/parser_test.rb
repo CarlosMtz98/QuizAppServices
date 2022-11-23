@@ -82,4 +82,11 @@ class ParserTest < Minitest::Test
     hash.delete('Id')
     assert hash != nil
   end
+
+  def test_update_hash
+    question = Question.new(nil, "test", [Option.new(nil, "Hello", true), Option.new(nil , "World", false)])
+    question.set_id.set_options_id
+    hash = question.update_hash
+    assert hash != null
+  end
 end

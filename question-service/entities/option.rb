@@ -20,6 +20,13 @@ class Option < EntityBase
   end
 
   def to_hash
-    { "text" => @text, "isCorrect" => @is_correct_answer }
+    { "id" => @id, "text" => @text, "isCorrect" => @is_correct_answer }
+  end
+
+  def update_hash
+    { "text" =>
+        {'value' => @text, 'action' => 'PUT'},
+      "isCorrect" =>
+        { 'value' => @is_correct_answer, 'action' => 'PUT'} }
   end
 end

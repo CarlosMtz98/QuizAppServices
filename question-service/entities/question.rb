@@ -8,10 +8,6 @@ class Question < EntityBase
     super(id)
   end
 
-  def update(value)
-
-  end
-
   def add_option(option)
     if !option.nil? && option.is_valid?
     end
@@ -38,10 +34,23 @@ class Question < EntityBase
     end
   end
 
+  def set_options_id
+    @options.each { |opt| opt.set_id }
+    self
+  end
+
   def to_hash
     base = self.to_h
     hash = {"text" => @value,
             "options" => @options.map { |opt| opt.to_hash }}
     base.merge(hash)
+  end
+
+  def update_hash
+    {
+      'text' => { 'value' => @value, 'action' => 'PUT' },
+      'UpdatedDate' => { 'value' => @updated_date.to_s, 'action' => 'PUT'},
+      'options' => {'value' => @options.map { |opt| opt.to_hash }, 'action' => 'PUT'}
+    }
   end
 end

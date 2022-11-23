@@ -33,7 +33,7 @@ class QuestionRepository
         response.item
       end
     rescue Exception => ex
-      @logger.fatal("question-service | QuestionRepository | find | Exception", ex)
+      @logger.fatal("question-service | QuestionRepository | find_by | Exception", ex)
     end
   end
 
@@ -43,32 +43,44 @@ class QuestionRepository
       error = entity.is_valid?
       if error.nil?
         begin
-          question = @client.put_item(table_name: @table_name, item: entity.set_id.set_created_date.to_hash)
-          @logger.info("question-service | QuestionRepository | create | Success | Id: #{question}")
-          return question
+          response = @client.put_item(table_name: @table_name, item: entity.set_id.set_options_id.set_created_date.to_hash)
+          @logger.info("question-service | QuestionRepository | create | Success")
+          response.successful?
         rescue Exception => ex
-          @logger.error("question-service | QuestionRepository | Exception #{ex.message}")
+          @logger.error("question-service | QuestionRepository | create | Exception #{ex.message}")
         end
       else
-        @logger.error("question-service | QuestionRepository | Question object is invalid")
+        @logger.error("question-service | QuestionRepository | create | Question object is invalid")
         raise Exception.new"Unable to persist Question object, Error: #{error}"
       end
     end
   end
 
-  def update(entity)
+  def update(id, entity)
+    @logger.info("question-service | QuestionRepository | update | Start")
     unless entity.nil?
-      if entity.is_valid?
-        query =  { Id: entity.id }
-        question = entity.set_updated_date.to_hash
-        question.delete('Id')
-        @client.update_item(table_name: @table_name, key: query, attribute_updates: question)
+      error = entity.is_valid?
+      if error.nil?
+        @logger.info("question-service | QuestionRepository | update | IsValid")
+        query =  { Id: id }
+        question = entity.set_updated_date.update_hash
+        response = @client.update_item(table_name: @table_name, key: query, attribute_updates: question)
+        @logger.info("question-service | QuestionRepository | update | End")
+        response.successful?
+      else
+        @logger.info("question-service | QuestionRepository | update | Invalid question #{error}")
       end
     end
   end
 
   def delete(id)
-    super
+    @logger.info("question-service | QuestionRepository | delete | Start")
+    unless id.nil?
+      query = { Id: id }
+      response = @client.delete_item(table_name: @table_name, key: query)
+      @logger.info("question-service | QuestionRepository | delete | End")
+      response.successful?
+    end
   end
 
   def is_valid_entity?(entity)
