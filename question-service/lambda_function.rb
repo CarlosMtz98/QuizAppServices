@@ -89,8 +89,13 @@ def handle_put(query, body)
       ServiceResponse.bad_request("Could not parse the body for question update")
     else
       res = @repository.update(id, question)
-      @logger.info("question-service | handle_put | End")
-      ServiceResponse.service_response(200, res)
+      if res
+        @logger.info("question-service | handle_put | Success | End")
+        ServiceResponse.ok(question)
+      else
+        @logger.info("question-service | handle_put | Fail | End")
+        ServiceResponse.error("Could not update the question with Id: #{id}")
+      end
     end
   end
 end
