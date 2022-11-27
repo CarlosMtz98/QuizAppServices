@@ -86,4 +86,12 @@ class QuestionRepository
   def is_valid_entity?(entity)
     entity.is_a?(Question)
   end
+
+  def count
+    begin
+      @client.scan(table_name: @table_name, select: "COUNT")
+    rescue Exception => ex
+      @logger.info("question-service | QuestionRepository | update | Invalid question #{error}")
+    end
+  end
 end
