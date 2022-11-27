@@ -34,7 +34,7 @@ class QuizRepository
         response = @client.put_item(table_name: @table_name, item: item.to_hash)
         if response.successful?
           @logger.info("question-service | QuizRepository | create | Success")
-          item
+          response
         else
           @logger.error("question-service | QuizRepository | create | Failed")
         end

@@ -1,0 +1,1 @@
+zip -r lambda.zip Gemfile Gemfile.lock entities helpers lambda_function.rb repositories services vendor

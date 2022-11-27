@@ -1,4 +1,2 @@
 source 'https://rubygems.org'
-require 'faraday'
-require 'json'
-require 'aws-sdk-dynamodb'
+gem 'faraday'

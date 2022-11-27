@@ -1,6 +1,7 @@
 require_relative 'entity_base'
 
 class Quiz < EntityBase
+  attr_reader :id, :user_name, :questions, :quantity
   def initialize(id, user_name, status, quantity, grade, category)
     @user_name = user_name
     @grade = grade
@@ -19,6 +20,14 @@ class Quiz < EntityBase
 
   def set_questions(questions)
     @questions = questions
+    self
+  end
+
+  def set_quantity
+    unless questions.nil?
+      @quantity = questions.length()
+      self
+    end
   end
 
   def set_grade(grade)
@@ -35,19 +44,19 @@ class Quiz < EntityBase
 
   def to_hash
     base = self.to_h
-    hash = {'userName' => @user_name,
-            'quantity' => @quantity,
-            'status' => @status,
-            'grade' => @grade,
-            'category' => @category,
-            'question' => @questions }
+    hash = {'UserName' => @user_name,
+            'Quantity' => @quantity,
+            'Status' => @status,
+            'Grade' => @grade,
+            'Category' => @category,
+            'Question' => @questions }
     base.merge(hash)
   end
 
   def update_hash
     {
-      'grade' => { 'value' => @grade, 'action' => 'PUT'},
-      'status' => { 'value' => @status, 'action' => 'PUT'},
+      'Grade' => { 'value' => @grade, 'action' => 'PUT'},
+      'Status' => { 'value' => @status, 'action' => 'PUT'},
       'UpdatedDate' => { 'value' => @updated_date.to_s, 'action' => 'PUT'}
     }
   end

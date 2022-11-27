@@ -22,7 +22,7 @@ class HttpResponse
     end
 
     body = {
-      is_success: true,
+      success?: true,
       entity: entity
     }
 

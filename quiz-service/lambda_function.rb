@@ -1,5 +1,6 @@
 require 'json'
 require 'logger'
+require 'faraday'
 require_relative 'services/question_service'
 require_relative 'repositories/quiz_repository'
 require_relative 'helpers/http_response'
@@ -55,10 +56,16 @@ def handle_post(body)
   end
   new_quiz = ParserHelper.parse_from_json(body)
   if new_quiz.is_a? Quiz
-    questions = @question_service.get_random_questions
-    new_quiz.set_questions(questions)
+    questions_response = @question_service.get_random_questions
+    if questions_response.success
+      new_quiz.set_questions(questions_response.entity).set_quantity
+    end
     res = @repository.create(new_quiz)
-    HttpResponse.ok(res)
+    if res.nil?
+      HttpResponse.error("Could not create response")
+    else
+      HttpResponse.ok({ id: new_quiz.id, user_name: new_quiz.user_name, questions: new_quiz.questions, quantity: new_quiz.quantity })
+    end
   else
     HttpResponse.bad_request('Could not generate quiz from body')
   end

@@ -1,4 +1,5 @@
 class ServiceResponse
+  attr_reader :success, :entity, :status_detail, :error_code
   def initialize(success, entity, status_details, error_code)
     @success = success
     @entity = entity
