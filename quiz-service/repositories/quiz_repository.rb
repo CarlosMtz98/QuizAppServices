@@ -26,6 +26,30 @@ class QuizRepository
     end
   end
 
+  def find_with_query(query, limit)
+    begin
+      limit.nil? ? 10 : limit
+      res = @client.scan(table_name: @table_name, scan_filter: query).items
+      unless res.items.nil?
+        return res.items
+      end
+    rescue Exception => ex
+      @logger.fatal("question-service | QuestionRepository | find | Exception: #{ex.message}",)
+    end
+  end
+
+  def find_top
+    begin
+      project = 'id, username, grade, category, createdDate'
+      res = @client.scan(table_name: @table_name, projection_expression: project)
+      unless res.items.nil?
+        return res.items
+      end
+    rescue Exception => ex
+      @logger.fatal("question-service | QuestionRepository | find | Exception: #{ex.message}",)
+    end
+  end
+
   def find_by(id)
     @logger.info("quiz-service | QuizRepository | find_by | Start | id: #{id || ''}")
     unless id.nil?

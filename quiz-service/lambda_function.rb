@@ -37,7 +37,19 @@ end
 
 def handle_get(path, query)
   id = get_entity_url_id(path, 'quiz')
-  if !id.nil?
+  if path.include?('/top-scores')
+    limit = get_entity_url_id(path, 'top-scores')
+    quizzes_data = @repository.find_top
+    if quizzes_data.nil?
+      HttpResponse.not_found("No quizzes found")
+    else
+      quizzes = quizzes_data.map { |qd| ParserHelper.parse_from_hash(qd) }.sort { |quiz| -quiz.grade }
+      if limit
+        quizzes = quizzes.take(limit)
+      end
+      HttpResponse.service_response(200, quizzes.map { |q| q.to_hash } )
+    end
+  elsif !id.nil?
     quiz = @repository.find_by(id)
     if quiz.nil?
       HttpResponse.entity_not_found('Quiz', id)
@@ -45,8 +57,8 @@ def handle_get(path, query)
       HttpResponse.ok(quiz.item)
     end
   elsif !query.nil?
-    # findWith Params
-    HttpResponse.service_response(200, query)
+    quizzes = @repository.find_with_query(query, limit)
+    HttpResponse.ok(200, quizzes)
   else
     # get all quizzes
     HttpResponse.service_response(200, {})

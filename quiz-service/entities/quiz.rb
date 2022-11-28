@@ -1,7 +1,7 @@
 require_relative 'entity_base'
 
 class Quiz < EntityBase
-  attr_reader :id, :user_name, :questions, :quantity, :answers
+  attr_reader :id, :user_name, :questions, :quantity, :answers, :grade
   def initialize(id, user_name, status, quantity, grade, category, questions, answers)
     @user_name = user_name
     @grade = grade
