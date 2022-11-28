@@ -1,7 +1,7 @@
 require 'json'
 require 'logger'
-require_relative 'helpers/service_response'
-require_relative 'helpers/json_helper'
+require_relative 'helpers/http_response_helper'
+require_relative 'helpers/parser_helper'
 require_relative 'repositories/question_repository'
 require_relative 'question_service'
 
@@ -13,11 +13,11 @@ def lambda_handler(event:, context:)
   path = event.dig('requestContext', 'http', 'path')
 
   unless path.include? BASE_URI
-    return ServiceResponse.not_found("Path #{path} not found")
+    return HttpResponse.not_found("Path #{path} not found")
   end
 
   @repository = QuestionRepository.instance(@logger)
-  @question_service = QuestionService.new(@repository)
+  @question_service = QuestionService.new(@logger, @repository)
   method = event.dig('requestContext', 'http', 'method')
   case method
   when 'GET'
@@ -25,11 +25,11 @@ def lambda_handler(event:, context:)
   when 'POST'
     handle_post(event['body'])
   when 'PUT'
-    handle_put(event.dig("queryStringParameters"), event['body'])
+    handle_put(path, event['body'])
   when 'DELETE'
-    handle_delete(event.dig("queryStringParameters"))
+    handle_delete(path)
   else
-    ServiceResponse.method_not_allowed(method, BASE_URI)
+    HttpResponse.method_not_allowed(method, BASE_URI)
   end
 end
 
@@ -40,40 +40,61 @@ def handle_post(body)
     error = question.is_valid?
     if error.nil?
       new_question = @repository.create(question)
-      ServiceResponse.create_success(new_question)
+      if new_question
+        HttpResponse.create_success(question.to_hash)
+      else
+        HttpResponse.service_response(422, {message: "Could not create the question"})
+      end
     else
-      ServiceResponse.bad_request(error)
+      HttpResponse.bad_request(error)
     end
   rescue Exception => ex
-    ServiceResponse.error("Could not create the question Error: #{ex.message}")
+    HttpResponse.error("Could not create the question Error: #{ex.message}")
   end
 end
 
 def parse_body(body)
   if body.nil?
-    return ServiceResponse.bad_request("The request body is required")
+    return HttpResponse.bad_request("The request body is required")
   end
-  JsonHelper.parse_question(body)
+  ParserHelper.parse_question(body)
 end
 
 def handle_get(event)
   path = event.dig('requestContext', 'http', 'path')
   case
+
   when path.include?('/count')
     count = @repository.count
-    ServiceResponse.service_response(200, { total_items: count })
+    HttpResponse.service_response(200, { total_items: count })
+
   when path.include?('/random')
-    questions = @question_service.get_random_questions(5)
+    random_num_str = get_entity_url_id(path, 'random')
+    num = random_num_str.nil? ? 5 : random_num_str.to_i
+    questions = @question_service.get_random_questions(num)
     if questions.nil? || questions.length() == 0
-      ServiceResponse.not_found("No questions found")
+      HttpResponse.not_found("No questions found")
     else
-      ServiceResponse.ok(questions)
+      HttpResponse.ok(questions)
     end
+
+  when path.include?('/add-answer')
+    question_id = get_entity_url_id(path, 'question')
+    option_id = get_entity_url_id(path, 'option')
+    if question_id.nil?
+      HttpResponse.bad_request("Question id param is required")
+    elsif option_id.nil?
+      HttpResponse.bad_request("Option id param is required")
+    else
+      service_response = @question_service.get_correct_answer(question_id, option_id)
+      handle_service_response(service_response)
+    end
+
   else
     query = event.dig('queryStringParameters')
     if query.nil?
       questions = @repository.find
-      ServiceResponse.ok(questions)
+      HttpResponse.ok(questions)
     else
       handle_get_with_query(query)
     end
@@ -86,49 +107,77 @@ def handle_get_with_query(query)
   unless id.nil?
     question = @repository.find_by(id)
     if question.nil?
-      ServiceResponse.entity_not_found('question', id)
+      HttpResponse.entity_not_found('question', id)
     else
-      ServiceResponse.ok(question)
+      HttpResponse.ok(question)
     end
   end
 end
 
-def handle_put(query, body)
+def handle_put(path, body)
   @logger.info("question-service | handle_put | Start")
-  unless query.nil?
-    id = query.dig('id')
+  unless path.nil?
+    id = get_entity_url_id(path, 'question')
+    if id.nil?
+      HttpResponse.bad_request('The id is required to update the question')
+    end
     if @repository.find_by(id).nil?
-      ServiceResponse.entity_not_found("question", id)
+      HttpResponse.entity_not_found("question", id)
     end
     question = parse_body(body)
     if question.nil?
-      ServiceResponse.bad_request("Could not parse the body for question update")
+      HttpResponse.bad_request("Could not parse the body for question update")
     else
       res = @repository.update(id, question)
       if res
         @logger.info("question-service | handle_put | Success | End")
-        ServiceResponse.ok(question)
+        HttpResponse.ok(question)
       else
         @logger.info("question-service | handle_put | Fail | End")
-        ServiceResponse.error("Could not update the question with Id: #{id}")
+        HttpResponse.error("Could not update the question with Id: #{id}")
       end
     end
   end
 end
 
-def handle_delete(query)
+def handle_delete(path)
   @logger.info("question-service | handle_delete | Start")
-  unless query.nil?
-    id = query.dig('id')
-    if @repository.find_by(id).nil?
-      ServiceResponse.entity_not_found("question", id)
+  unless path.nil?
+    id = get_entity_url_id(path, 'question')
+    if id.nil?
+      HttpResponse.bad_request("Id route param is required to delete question")
+    elsif @repository.find_by(id).nil?
+      HttpResponse.entity_not_found("question", id)
     else
-      resp = @repository.delete(id)
-      if resp
-        ServiceResponse.service_response(200,{Id: id})
+      if @repository.delete(id)
+        HttpResponse.service_response(200, { message: "Question id: #{id} deleted successfully"})
       else
-        ServiceResponse.error('Could not delete the question')
+        HttpResponse.error('Could not delete the question')
       end
+    end
+  end
+end
+
+def get_entity_url_id(url, entity_name)
+  id = url.match /\/#{entity_name}\/([\w|-]+)/
+  unless id.nil?
+    id[1]
+  end
+end
+
+def handle_service_response(service_response)
+  if service_response.success
+    HttpResponse.ok(service_response.entity)
+  else
+    case service_response.error_code
+    when 400
+      HttpResponse.bad_request(service_response.status_detail)
+    when 404
+      HttpResponse.not_found(service_response.status_detail)
+    when 405
+      HttpResponse.method_not_allowed(service_response.status_detail)
+    else
+      HttpResponse.error(service_response.status_detail)
     end
   end
 end

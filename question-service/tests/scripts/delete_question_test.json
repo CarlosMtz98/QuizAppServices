@@ -1,0 +1,41 @@
+{
+    "headers": {
+      "content-length": "86",
+      "x-amzn-tls-version": "TLSv1.2",
+      "x-forwarded-proto": "https",
+      "postman-token": "39293e08-8600-4f7b-9d3e-a0a4ad0a2aff",
+      "x-forwarded-port": "443",
+      "x-forwarded-for": "200.68.186.6",
+      "accept": "*/*",
+      "x-amzn-tls-cipher-suite": "ECDHE-RSA-AES128-GCM-SHA256",
+      "x-amzn-trace-id": "Root=1-6382a4bc-3de2c55e44c70d9551b233fe",
+      "host": "4ko7zrz5rs7orwgxcsdphnerrm0gzkwb.lambda-url.us-east-1.on.aws",
+      "content-type": "application/json",
+      "accept-encoding": "gzip, deflate, br",
+      "user-agent": "PostmanRuntime/7.29.2"
+    },
+    "isBase64Encoded": false,
+    "rawPath": "/question/54c4b0d7-39cb-4581-afec-223ed133eab0",
+    "routeKey": "$default",
+    "requestContext": {
+      "accountId": "anonymous",
+      "timeEpoch": 1669506236632,
+      "routeKey": "$default",
+      "stage": "$default",
+      "domainPrefix": "4ko7zrz5rs7orwgxcsdphnerrm0gzkwb",
+      "requestId": "e7b6d62a-66b4-4c00-8334-6eafb09e89e8",
+      "domainName": "4ko7zrz5rs7orwgxcsdphnerrm0gzkwb.lambda-url.us-east-1.on.aws",
+      "http": {
+        "path": "/question/54c4b0d7-39cb-4581-afec-223ed133eab0",
+        "protocol": "HTTP/1.1",
+        "method": "DELETE",
+        "sourceIp": "200.68.186.6",
+        "userAgent": "PostmanRuntime/7.29.2"
+      },
+      "time": "26/Nov/2022:23:43:56 +0000",
+      "apiId": "4ko7zrz5rs7orwgxcsdphnerrm0gzkwb"
+    },
+    "body": "{\n    \"templateId\": \"\",\n    \"sessionId\": \"\",\n    \"grade\": 10,\n    \"status\":\"ONGOING\"\n}",
+    "version": "2.0",
+    "rawQueryString": ""
+}

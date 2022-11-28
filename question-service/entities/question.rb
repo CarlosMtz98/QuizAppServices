@@ -2,8 +2,10 @@ require_relative 'option'
 require_relative 'entity_base'
 
 class Question < EntityBase
-  def initialize(id, value, options)
+  attr_reader :options
+  def initialize(id, value, category, options)
     @value = value
+    @category = category
     @options = options.nil? ? [] : options
     super(id)
   end
@@ -41,15 +43,17 @@ class Question < EntityBase
 
   def to_hash
     base = self.to_h
-    hash = {"text" => @value,
+    hash = {"value" => @value,
+            "category" => @category,
             "options" => @options.map { |opt| opt.to_hash }}
     base.merge(hash)
   end
 
   def update_hash
     {
-      'text' => { 'value' => @value, 'action' => 'PUT' },
-      'UpdatedDate' => { 'value' => @updated_date.to_s, 'action' => 'PUT'},
+      'value' => { 'value' => @value, 'action' => 'PUT' },
+      'category' => { 'value' => @category, 'action' => 'PUT' },
+      'updatedDate' => { 'value' => @updated_date.to_s, 'action' => 'PUT'},
       'options' => {'value' => @options.map { |opt| opt.to_hash }, 'action' => 'PUT'}
     }
   end

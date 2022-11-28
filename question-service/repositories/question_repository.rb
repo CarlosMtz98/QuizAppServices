@@ -28,12 +28,13 @@ class QuestionRepository
 
   def find_by(id)
     begin
-      response = @client.get_item(table_name: @table_name, key: { Id: id })
+      response = @client.get_item(table_name: @table_name, key: { id: id })
       unless response.nil? && response.item.nil?
         response.item
       end
     rescue Exception => ex
-      @logger.fatal("question-service | QuestionRepository | find_by | Exception", ex)
+      @logger.fatal("question-service | QuestionRepository | find_by | Exception: #{ex.message}")
+      nil
     end
   end
 
@@ -62,7 +63,7 @@ class QuestionRepository
       error = entity.is_valid?
       if error.nil?
         @logger.info("question-service | QuestionRepository | update | IsValid")
-        query =  { Id: id }
+        query =  { id: id }
         question = entity.set_updated_date.update_hash
         response = @client.update_item(table_name: @table_name, key: query, attribute_updates: question)
         @logger.info("question-service | QuestionRepository | update | End")
@@ -76,7 +77,7 @@ class QuestionRepository
   def delete(id)
     @logger.info("question-service | QuestionRepository | delete | Start")
     unless id.nil?
-      query = { Id: id }
+      query = { id: id }
       response = @client.delete_item(table_name: @table_name, key: query)
       @logger.info("question-service | QuestionRepository | delete | End")
       response.successful?
@@ -89,7 +90,7 @@ class QuestionRepository
 
   def count
     begin
-      @client.scan(table_name: @table_name, select: "COUNT")
+      @client.scan(table_name: @table_name, select: "COUNT").count
     rescue Exception => ex
       @logger.info("question-service | QuestionRepository | update | Invalid question #{error}")
     end

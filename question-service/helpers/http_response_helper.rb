@@ -1,7 +1,7 @@
 require 'json'
-require_relative 'http_helpers'
+require_relative 'http_status_helpers'
 
-class ServiceResponse
+class HttpResponse
   def self.service_response(code, body)
     {
       statusCode: code,
@@ -22,7 +22,7 @@ class ServiceResponse
     end
 
     body = {
-      is_success: true,
+      success?: true,
       entity: entity
     }
 
@@ -66,7 +66,7 @@ class ServiceResponse
     end
 
     body = {
-      is_success: false,
+      success?: false,
       status_detail: message
     }
 

@@ -1,7 +1,7 @@
 require 'minitest/autorun'
 require 'json'
 require 'securerandom'
-require_relative '../helpers/json_helper'
+require_relative '../helpers/parser_helper'
 
 class ParserTest < Minitest::Test
   def setup
@@ -57,7 +57,7 @@ class ParserTest < Minitest::Test
     json = string_payload
     assert !json.nil?
     assert !json.empty?
-    question = JsonHelper.parse_question(json)
+    question = ParserHelper.parse_question(json)
     assert !question.nil?, "Expecting to construct a question object"
   end
 
@@ -65,13 +65,14 @@ class ParserTest < Minitest::Test
     json = JSON.generate(object_new_entity)
     assert !json.nil?
     assert !json.empty?
-    question = JsonHelper.parse_question(json)
+    question = ParserHelper.parse_question(json)
     assert !question.nil?, "Expecting to construct a question object"
   end
 
   def test_create_object_hash
     question = Question.new(nil, "test", [Option.new(nil, "Hello", true), Option.new(nil , "World", false)])
     question.set_created_date
+    question.set_options_id
     res = question.to_hash
     assert !res.nil?
   end
@@ -79,7 +80,7 @@ class ParserTest < Minitest::Test
   def test_delete_key_hash
     question = Question.new(nil, "test", [Option.new(nil, "Hello", true), Option.new(nil , "World", false)])
     hash = question.set_updated_date.to_hash
-    hash.delete('Id')
+    hash.delete('id')
     assert hash != nil
   end
 

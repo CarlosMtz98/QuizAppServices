@@ -1,32 +1,31 @@
 require_relative 'entity_base'
 
 class Option < EntityBase
-  def initialize(id, text, is_correct_answer)
+  attr_reader :is_correct, :text
+  def initialize(id, text, is_correct)
     @text = text
-    @is_correct_answer = is_correct_answer
+    @is_correct = is_correct
     super(id)
   end
 
   def is_valid?
     if @text.nil? || @text.empty?
-      return "Option text is required"
+      "Option text is required"
     end
 
-    if @is_correct_answer.nil?
-      return "Option text is required"
+    if @is_correct.nil?
+      "Option correct answer is required"
     end
-
-    nil
   end
 
   def to_hash
-    { "id" => @id, "text" => @text, "isCorrect" => @is_correct_answer }
+    { "id" => @id, "text" => @text, "isCorrect" => @is_correct }
   end
 
   def update_hash
     { "text" =>
         {'value' => @text, 'action' => 'PUT'},
       "isCorrect" =>
-        { 'value' => @is_correct_answer, 'action' => 'PUT'} }
+        { 'value' => @is_correct, 'action' => 'PUT'} }
   end
 end
