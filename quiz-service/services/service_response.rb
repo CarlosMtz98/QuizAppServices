@@ -1,9 +1,9 @@
 class ServiceResponse
   attr_reader :success, :entity, :status_detail, :error_code
-  def initialize(success, entity, status_details, error_code)
+  def initialize(success, entity, status_detail, error_code)
     @success = success
     @entity = entity
-    @status_detail = status_details
+    @status_detail = status_detail
     @error_code = error_code
   end
 

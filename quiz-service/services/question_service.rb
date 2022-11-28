@@ -21,4 +21,20 @@ class QuestionService
       ServiceResponse.ok(questions)
     end
   end
+
+  def get_correct_answer(question_id, option_id)
+    @logger.info('QuestionService | check_correct_answer | Start')
+    unless question_id.nil?
+      response = Faraday.get("#{@base_url}#{question_id}/correct-answer/option/#{option_id}")
+      if !response.success?
+        @logger.info('QuestionService | check_correct_answer | Failed')
+        ServiceResponse.fail("Failed to check the correct answer")
+      else
+        res = JSON.parse(response.body)
+        response_entity = res.dig('entity')
+        @logger.info('QuestionService | check_correct_answer | Success')
+        ServiceResponse.ok(response_entity)
+      end
+    end
+  end
 end

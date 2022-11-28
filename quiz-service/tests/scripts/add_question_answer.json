@@ -1,4 +1,3 @@
-
 {
   "headers": {
     "content-length": "86",
@@ -16,7 +15,7 @@
     "user-agent": "PostmanRuntime/7.29.2"
   },
   "isBase64Encoded": false,
-  "rawPath": "/quiz",
+  "rawPath": "https://4ko7zrz5rs7orwgxcsdphnerrm0gzkwb.lambda-url.us-east-1.on.aws/quiz/d1cb03b5-132e-4e0a-80fa-82a668e6cef2/add-answer",
   "routeKey": "$default",
   "requestContext": {
     "accountId": "anonymous",
@@ -27,16 +26,16 @@
     "requestId": "e7b6d62a-66b4-4c00-8334-6eafb09e89e8",
     "domainName": "4ko7zrz5rs7orwgxcsdphnerrm0gzkwb.lambda-url.us-east-1.on.aws",
     "http": {
-      "path": "/quiz",
+      "path": "https://4ko7zrz5rs7orwgxcsdphnerrm0gzkwb.lambda-url.us-east-1.on.aws/quiz/d1cb03b5-132e-4e0a-80fa-82a668e6cef2/add-answer",
       "protocol": "HTTP/1.1",
-      "method": "POST",
+      "method": "PUT",
       "sourceIp": "200.68.186.6",
       "userAgent": "PostmanRuntime/7.29.2"
     },
     "time": "26/Nov/2022:23:43:56 +0000",
     "apiId": "4ko7zrz5rs7orwgxcsdphnerrm0gzkwb"
   },
-  "body": "{\n    \"userName\": \"Jorge Lubowitz\",\n    \"quantity\": 15,\n    \"status\": 1,\n    \"templateId\": \"d100769d-be3e-4fdd-b12b-2675e9bc3bc7\"\n}",
+  "body": "{\"questionId\":\"601f22c2-32cc-4027-9242-a8ead2044105\",\"optionId\":\"2d013123-fb1b-4d6e-89df-547bd4f89651\"}",
   "version": "2.0",
   "rawQueryString": ""
 }

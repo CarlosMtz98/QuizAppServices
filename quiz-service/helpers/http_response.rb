@@ -66,7 +66,7 @@ class HttpResponse
     end
 
     body = {
-      is_success: false,
+      success?: false,
       status_detail: message
     }
 

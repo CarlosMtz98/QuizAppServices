@@ -31,12 +31,15 @@ class TestFunction < Minitest::Test
     assert_match('function_count', result.to_s, 'Should match')
   end
 
-  def test_get_quiz
-
-  end
-
-  def test_get_quizzes
-
+  def test_check_answer
+    file_name = "#{__dir__}/scripts/add_question_answer.json"
+    exists = File.exists?(file_name)
+    assert exists
+    file = File.read(file_name)
+    event = JSON.parse(file)
+    context = Hash.new
+    result = lambda_handler(event: event, context: context)
+    assert_match('function_count', result.to_s, 'Should match')
   end
 
 end

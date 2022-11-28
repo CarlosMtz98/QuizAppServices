@@ -1,5 +1,6 @@
 require 'json'
 require_relative '../entities/quiz'
+require_relative '../entities/answer'
 
 class ParserHelper
   def self.parse_from_json(json)
@@ -21,7 +22,25 @@ class ParserHelper
     status = get_status(data_object.dig('status'))
     grade = data_object.dig('grade')
     category = data_object.dig('category')
-    Quiz.new(id, user_name, status, quantity, grade, category)
+    answers_data_object = data_object.dig('answers')
+    questions = data_object.dig('questions')
+    answers = nil
+
+    unless answers_data_object.nil?
+      answers = answers_data_object.map { |ans| self.parse_answer_from_hash(ans) }
+    end
+
+    Quiz.new(id, user_name, status, quantity.to_i, grade.to_i, category, questions, answers)
+  end
+
+  def self.parse_answer_from_hash(data_object)
+    unless data_object.nil?
+      id = data_object.dig('id')
+      is_correct = data_object.dig('isCorrect')
+      correct_answer = data_object.dig('correctAnswer')
+      question_id = data_object.dig('questionId')
+      Answer.new(id, is_correct, correct_answer, question_id)
+    end
   end
 
   def self.get_status(status)

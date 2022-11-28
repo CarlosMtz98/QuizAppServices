@@ -34,17 +34,17 @@ class EntityBase
   end
 
   def to_h
-    hash = { "Id" => @id }
+    hash = { "id" => @id }
     unless @created_date.nil?
-      hash['CreatedDate'] = @created_date.to_s
+      hash['createdDate'] = @created_date.to_s
     end
 
     unless @updated_date.nil?
-      hash['UpdatedDate'] = @updated_date.to_s
+      hash['updatedDate'] = @updated_date.to_s
     end
 
     unless @deleted_date.nil?
-      hash['DeletedDate'] = @deleted_date.to_s
+      hash['deletedDate'] = @deleted_date.to_s
     end
     hash
   end
