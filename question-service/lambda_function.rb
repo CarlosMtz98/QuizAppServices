@@ -1,3 +1,10 @@
+# Final Project: Quiz Application with Microservices
+# Date: 28-Nov-2022
+# Authors:
+#          A01375577 Carlos Martínez
+#          A01374561 Paco Murillo
+# File: lambda_function.rb
+
 require 'json'
 require 'logger'
 require_relative 'helpers/http_response_helper'

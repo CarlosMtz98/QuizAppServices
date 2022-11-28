@@ -1,3 +1,10 @@
+# Final Project: Quiz Application with Microservices
+# Date: 28-Nov-2022
+# Authors:
+#          A01375577 Carlos Martínez
+#          A01374561 Paco Murillo
+# File: parser_helper.rb
+
 require_relative '../entities/option'
 require_relative '../entities/question'
 
