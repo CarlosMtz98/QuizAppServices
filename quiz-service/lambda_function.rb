@@ -38,15 +38,11 @@ end
 def handle_get(path, query)
   id = get_entity_url_id(path, 'quiz')
   if path.include?('/top-scores')
-    limit = get_entity_url_id(path, 'top-scores')
     quizzes_data = @repository.find_top
     if quizzes_data.nil?
       HttpResponse.not_found("No quizzes found")
     else
       quizzes = quizzes_data.map { |qd| ParserHelper.parse_from_hash(qd) }.sort { |quiz| -quiz.grade }
-      if limit
-        quizzes = quizzes.take(limit)
-      end
       HttpResponse.service_response(200, quizzes.map { |q| q.to_hash } )
     end
   elsif !id.nil?
@@ -77,11 +73,12 @@ def handle_post(path, body)
       else
         quiz = ParserHelper.parse_from_hash(quiz_data.item)
         if quiz.nil?
-          HttpResponse.service_response(422, message: 'Could not finish the quiz')
+          HttpResponse.service_response(422, { message: 'Could not finish the quiz', entity: quiz_data.item })
+        else
+          update_response = @repository.update(quiz_id, quiz.finish)
         end
-        update_response = @repository.update(quiz_id, quiz.finish)
         if update_response.nil? || update_response.attributes.nil?
-          HttpResponse.service_response(422, message: 'Could not update the quiz')
+          HttpResponse.service_response(422, { message: 'Could not finish the quiz', entity: quiz_data.item })
         else
           res = update_response.attributes
           obj = ParserHelper.parse_from_hash(res)
@@ -139,7 +136,8 @@ def handle_put(path, body)
           HttpResponse.error(correct_answer_response.status_detail)
         else
           is_correct = correct_answer_response.entity.dig('correct?')
-          correct_answer = correct_answer_response.entity.dig('correctAnswer?')
+          correct_answer = correct_answer_response.entity.dig('correctAnswer')
+          @logger.info("Correct Answer: #{correct_answer}")
           answer = Answer.new(nil, is_correct, correct_answer, question_id).set_id.set_created_date
           res = @repository.add_answers(id, answer)
           if res.nil?
@@ -149,8 +147,8 @@ def handle_put(path, body)
           end
         end
       end
-  else
-    HttpResponse.method_not_allowed('PUT', 'quiz')
+    else
+      HttpResponse.method_not_allowed('PUT', 'quiz')
     end
   end
 end
